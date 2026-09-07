@@ -49,10 +49,10 @@ $('share').onclick = () => { const url = location.href; (navigator.share ? navig
 // ---------- render ----------
 function render() {
   const lobby = S.phase === 'lobby';
-  $('join').hidden = true; $('wait').hidden = false; $('lobby').hidden = !lobby; $('game').hidden = lobby; $('bar').hidden = lobby;
+  $('join').hidden = true; $('wait').hidden = false; $('lobby').hidden = !lobby; $('game').hidden = lobby;
   if (lobby) {
     $('code').textContent = S.code;
-    $('lobby-players').innerHTML = S.players.map((p, i) => `<div class="pl" style="--pc:${COLORS[p.color]}">${esc(p.name)}${i === 0 ? ' 👑' : ''}${p.id === pid ? ' (you)' : ''}</div>`).join('') || '<p class="total">Waiting for players…</p>';
+    $('lobby-players').innerHTML = S.players.map((p, i) => `<div class="pl" style="--pc:${COLORS[p.color]}">${esc(p.name)}${i === 0 ? ' 👑' : ''}${p.id === pid ? ' (you)' : ''}</div>`).join('') || '<p class="note">Waiting for players…</p>';
     $('start').hidden = me() !== 0; $('start').disabled = S.players.length < 2;
     return;
   }
@@ -74,7 +74,7 @@ function phaseText() {
   }
 }
 function renderTop() {
-  $('banner').textContent = phaseText(); $('banner').className = mine() ? 'me' : '';
+  $('banner').textContent = phaseText(); $('banner').classList.toggle('me', mine());
   $('chips').innerHTML = S.players.map((p, i) => `<span class="chip${i === S.current ? ' turn' : ''}${S.online && !S.online[p.id] ? ' off' : ''}" style="--pc:${COLORS[p.color]}">${esc(p.name)} <b>${vp(S, i)}</b>🏆 ${count(p.hand)}🂠 ${p.knights}⚔️${S.largestArmy?.pi === i ? '🏅' : ''} ${longest(S, i)}🛣️${S.longestRoad?.pi === i ? '🏅' : ''}</span>`).join('');
 }
 function renderBoard() {
@@ -179,8 +179,8 @@ function pick(title, options) { // options: [[label, value]] -> Promise<value|nu
 }
 function renderShelves() {
   const i = me();
-  $('devcards').innerHTML = i < 0 ? '' : P(i).dev.map((c, k) => `<div class="item"><span class="name">${ICON[c.t]} ${c.t}</span>${c.t === 'Victory Point' ? '<small>counts at 10</small>' : `<button data-dev="${k}" ${canPlayDev(S, i, c.t) && mine() && ['roll', 'main'].includes(S.phase) ? '' : 'disabled'}>Play</button>`}</div>`).join('') || '<p class="total">No dev cards yet</p>';
-  $('players').innerHTML = S.players.map((p, k) => `<div class="player" style="--pc:${COLORS[p.color]}"><b>${esc(p.name)}</b> · ${vp(S, k)} VP · ${count(p.hand)} cards · ${p.dev.length} dev · ⚔️${p.knights} · 🛣️${longest(S, k)}<br><small>${LIMITS.road - p.roads.length} roads, ${LIMITS.settlement - p.settlements.length} settlements, ${LIMITS.city - p.cities.length} cities left</small></div>`).join('') + `<p class="total">Bank: ${RESOURCES.map(r => S.bank[r] + ICON[r]).join(' ')} · ${S.deck.length - S.deckIdx} dev</p>`;
+  $('devcards').innerHTML = i < 0 ? '' : P(i).dev.map((c, k) => `<div class="item"><span class="name">${ICON[c.t]} ${c.t}</span>${c.t === 'Victory Point' ? '<small>counts at 10</small>' : `<button data-dev="${k}" ${canPlayDev(S, i, c.t) && mine() && ['roll', 'main'].includes(S.phase) ? '' : 'disabled'}>Play</button>`}</div>`).join('') || '<p class="note">No dev cards yet</p>';
+  $('players').innerHTML = S.players.map((p, k) => `<div class="player" style="--pc:${COLORS[p.color]}"><b>${esc(p.name)}</b> · ${vp(S, k)} VP · ${count(p.hand)} cards · ${p.dev.length} dev · ⚔️${p.knights} · 🛣️${longest(S, k)}<br><small>${LIMITS.road - p.roads.length} roads, ${LIMITS.settlement - p.settlements.length} settlements, ${LIMITS.city - p.cities.length} cities left</small></div>`).join('') + `<p class="note">Bank: ${RESOURCES.map(r => S.bank[r] + ICON[r]).join(' ')} · ${S.deck.length - S.deckIdx} dev</p>`;
   $('log').innerHTML = S.log.slice().reverse().map(l => `<li>${esc(l)}</li>`).join('');
 }
 $('devcards').onclick = async e => {
