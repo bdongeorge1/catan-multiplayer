@@ -1,0 +1,11 @@
+{
+  "rules": {
+    "rooms": {
+      "$code": {
+        ".read": true,
+        ".write": "!data.exists() || data.child('createdAt').val() > (now - 86400000)",
+        ".validate": "newData.hasChildren(['createdAt', 'code'])"
+      }
+    }
+  }
+}
